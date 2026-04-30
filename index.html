@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sleepwalk Press</title>
+  <meta name="description" content="Sleepwalk Press is an independent publisher of art books and experimental texts by artists and writers, working across photography, collage, drawing, essay, fiction, and criticism." />
+  <link rel="stylesheet" href="https://use.typekit.net/omh5mvu.css" />
+  <style>
+    :root {
+      --color-fg: #e5e5e5;
+      --color-bg: #2c3322;
+      --page-pad-x: clamp(1rem, 1.6vw, 1.5rem);
+      --page-pad-y: clamp(1rem, 1.6vw, 1.5rem);
+      --gap-row: clamp(2rem, 6vw, 5rem);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-fg);
+      font-family: "neue-haas-grotesk-text", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.2;
+
+      /* Fill viewport, but never crush below 640px on very short screens */
+      min-height: max(100vh, 640px);
+      min-height: max(100dvh, 640px);
+
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: var(--page-pad-y) var(--page-pad-x);
+      row-gap: var(--gap-row);
+    }
+
+    .logo {
+      grid-row: 1;
+      width: 100%;
+      display: block;
+    }
+
+    .logo img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .spacer {
+      grid-row: 2;
+    }
+
+    .content {
+      grid-row: 3;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      column-gap: clamp(0.75rem, 1.5vw, 1.5rem);
+      row-gap: clamp(1.25rem, 2.5vw, 2rem);
+    }
+
+    .lede {
+      grid-column: 1 / span 9;
+      margin: 0;
+      font-size: clamp(1.5rem, 3.4vw, 3rem);
+      line-height: 1.18;
+      letter-spacing: -0.005em;
+    }
+
+    .about {
+      grid-column: 1 / span 5;
+      margin: 0;
+      font-size: clamp(1rem, 1.1vw, 1.125rem);
+      line-height: 1.45;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    a:hover,
+    a:focus-visible {
+      text-decoration-thickness: 2px;
+    }
+
+    /* Mobile / narrow viewports */
+    @media (max-width: 768px) {
+      :root {
+        --gap-row: clamp(1.5rem, 8vh, 3rem);
+      }
+
+      .lede,
+      .about {
+        grid-column: 1 / -1;
+      }
+
+      .lede {
+        font-size: clamp(1.5rem, 6.5vw, 2.25rem);
+      }
+
+      .about {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="logo">
+    <img src="assets/SLEEPWALK_logo_off-white.svg" alt="SLEEPWALK" />
+  </header>
+
+  <div class="spacer" aria-hidden="true"></div>
+
+  <main class="content">
+    <p class="lede">Sleepwalk Press is an independent publisher of art books and experimental texts by artists and writers, working across photography, collage, drawing, essay, fiction, and criticism.</p>
+    <p class="about">Founded as an infrastructure to materialize author vision, we work closely with artists and writers at any stage of their careers to realise new works of cultural expression. SLEEPWALK is based in Prague and distributes internationally. <a href="mailto:info@sleepwalk.site">Get&nbsp;in&nbsp;touch.</a></p>
+  </main>
+</body>
+</html>
