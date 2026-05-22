@@ -16,7 +16,7 @@
       --color-bg: #e54630; /*old color: #2c3322 */
       --page-pad-x: clamp(1rem, 1.6vw, 1.5rem);
       --page-pad-y: clamp(1rem, 1.6vw, 1.5rem);
-      --gap-row: clamp(2rem, 6vw, 5rem);
+      --gap-row: clamp(1rem, 4vw, 2rem);
     }
 
     *,
@@ -40,7 +40,9 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       line-height: 1.2;
+    }
 
+    .hero {
       /* Fill viewport, but never crush below 640px on very short screens */
       min-height: max(100vh, 640px);
       min-height: max(100dvh, 640px);
@@ -48,7 +50,6 @@
       display: grid;
       grid-template-rows: auto 1fr auto;
       padding: var(--page-pad-y) var(--page-pad-x);
-      row-gap: var(--gap-row);
     }
 
     .logo {
@@ -78,7 +79,7 @@
     }
 
     .lede {
-      grid-column: 1 / span 9;
+      grid-column: 1 / span 8;
       margin: 0;
       font-size: clamp(1.5rem, 3.4vw, 3rem);
       line-height: 1.18;
@@ -96,6 +97,50 @@
       color: inherit;
       text-decoration: underline;
       text-underline-offset: 0.15em;
+    }
+
+    .upcoming {
+      background-color: #333;
+      color: #fff000;
+      padding: calc(var(--page-pad-y)*4) var(--page-pad-x);
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      column-gap: clamp(0.75rem, 1.5vw, 1.5rem);
+      row-gap: clamp(1.25rem, 2.5vw, 2rem);
+    }
+
+    .upcoming-heading {
+      grid-column: 1 / -1;
+      margin: 0;
+      font-size: clamp(1.5rem, 3.4vw, 3rem);
+      line-height: 1.18;
+      letter-spacing: -0.005em;
+      font-weight: 400;
+    }
+
+    .upcoming-list {
+      grid-column: 1 / span 12;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.75rem, 1.5vw, 1.5rem);
+    }
+
+    .upcoming-list li {
+      font-size: clamp(1.5rem, 3.4vw, 3rem);
+      line-height: 1.18;
+      letter-spacing: -0.005em;
+      position: relative;
+      padding-left: 1.5em;
+    }
+
+    .upcoming-list li::before {
+      content: '✷';
+      position: absolute;
+      left: 0;
+      top: 0;
     }
 
     a:hover,
@@ -121,11 +166,21 @@
       .about {
         font-size: 1rem;
       }
+
+      .upcoming-list {
+        grid-column: 1 / -1;
+      }
+
+      .upcoming-heading,
+      .upcoming-list li {
+        font-size: clamp(1.5rem, 6.5vw, 2.25rem);
+      }
     }
   </style>
 </head>
 <body>
-  <header class="logo">
+  <section class="hero">
+    <header class="logo">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1717.01 587.12" role="img" aria-label="SLEEPWALK">
       <path d="M1668.59,46.64c4.09-2.99-.77-9.02-5.69-10.18-6.82-1.61-6.86-1.44-13.68-3.05-5.06-1.2-11.81-4.68-15.9-2.88-4.08,1.8-11.79,6.67-14.45,11.42-27.8,49.59-6.89,67.45-50.18,104.29-18.38-36.22-19.33-75.28-24.71-111.33-2.52-16.87-15.56-23.63-34.36-25.45-7.99-.78-27.37-5.03-33.99-.47-8.78,15.61,5.7,36.74,8.53,53.04,4.86,28.02-2.94,29.33,1.49,57.43,7.52,47.69,6.47,47.82,13.57,95.57,9.01,60.65-21.68,63.64-23.94,79.05-2.83,19.27,31.81,14.01,34.83,44.29,2.93,29.32-1.18,29.94,3.14,59.09,3.54,23.94,2.32,4.39,7.93,27.93,4.92,20.68,7.82,19.83,14.93,39.86,6.79,19.15,4.96,19.87,14.13,38q18.84,37.26,38.58,74.08c5.75,10.71,18.94,11.82,29.83,7.28,8.9-3.72,23.62-14.23,19.97-27.77-17.94-66.66-29.78-63.53-47.12-130.34-9.76-37.61-3.74-18.91-12.89-56.67-5.64-23.29-3.32-49.27,2.76-53.77,3.58-2.65,9.26,4.37,16.3,10.22,55.16,33.38,85.82,104.5,106.21,84.37,18.15-17.93,16.13-44.23,2.43-67.32-6.5-10.96-16.76-31.8-24.96-39.73-35.11-33.97-47.85-15.96-79.32-53.33-3.65-4.33,1.36-9.4,3.47-14.66,21.27-53,20.62-53.72,41.6-105.93.31-.78.57-1.59.75-2.42,2.22-10.04,17.38-78.12,20.76-80.59Z"/>
       <path d="M425.52,316.52c-5.58-7.19-18.25-43.33-12.32-50.1,36.79-24.39,38.45-21.88,74.98-46.67,8.5-9.78,7.33-24.38,2.03-34.09-14.74-27.02-85.61,23.65-98.43-4.9-3.66-8.15-1.52-22.85,1.25-33.59,6.97-26.98,36.16-35.91,63.09-37.4,23.97-1.33,23.82-4.14,47.79-5.46,18.07-1,14.54-2.16,31.55-23.7,17.01-21.54,1.84-23.82-17.05-23.86-18.03-.04-17.98,2.9-36.01,2.99-44.65.24-44.63-6.04-89.29-6.5-13.55-.14-36.76,3.75-46.05,11.54-15.96,13.38-6.47,34.26-5.05,49.84,1.88,20.73,2.55,20.78,3.57,41.57,1.9,38.9,1.91,39,2.3,77.94.31,30.88-4.35,30.91-3.87,61.79,2.31,46.24,8.33,73.07,48.01,83.07,17.61,4.44,103.94-23.88,119.85-29.94,17.11-6.53,29.18-9.84,33.97-30.82,1.77-7.75.14-17.31-4.86-23.7-16.2-20.72-99.04,43.14-115.46,22Z"/>
@@ -136,13 +191,23 @@
       <path d="M147.28,241.52c-13.05-16.74-23.23-40.2-20.12-62.75,5.55-40.12,34.98-66.84,69.86-79.94,13.93-12.8,3.16-34.58-7.29-46.82-10.04-11.76-28.01-18.06-41.51-7.35-38.92,30.87-84.82,97.41-83.41,140.88,1.24,38.16,12.38,70.12,33,100.96q25.88,38.68,51.66,77.42c9.78,14.62,10.26,20.38,1.96,36.32-2.48,3.55-.95,15.86-9.35,15.86-29.85,0-29.86,1.5-59.55,4.6-5.22.54-19-.12-22.61-3.6-10.45-10.1,8.37-48.24-17.76-67.14-22.31,7.26-16.71,13.56-31.23,31.99-25.09,31.84-3.76,79.74,30.74,96.43,21.62,10.46,40.24,18.08,63.11,15.89,32.82-3.15,67.55-7.2,91.93-31.53,0,0,5.98-4.99,7.51-6.07,45.12-31.99,40.8-89.42,8.53-130.81-33.43-41.61-32.67-42.24-65.48-84.32Z"/>
       <path d="M1162.88,67.7c-23.57-16.43-.79-48.53-32.88-65.84-4.04-2.18-16.66-3.1-18.65.98-9.16,18.76,14.23,53.29,3.78,107.53-4.03,20.95-1.48,43.33-2.97,64.97-3.54.49-14.92-3.25-15.51-5.8-1.18-5.16.62-5.57-.55-10.73-5.42-23.81-7.12-23.43-12.54-47.24-6.49-28.49-23.54-60.22-39.41-53.3-5.34,2.33-5.84,12.44-8.62,18.05-16.9,26.45-30.71,51.06-26.11,82.13.92,6.24,1.06,12.61-3.01,17.44-1.72,2.04.12,3.08-1.3,5.33-7.52,13.45-32.77-67.82-34.95-113.61-1.03-21.68-5.08-33.88-15.88-50.17-3.55-5.36-16.89-7.25-21.76-3.29-29.4,23.9-24.29,62.51-13.51,100.3,9.35,27.39,10.56,26.95,20.26,54.22,5.48,19.21,12.86,39.85,15.72,60.09,5.03,35.53,2.7,35.86,7.72,71.4,7.22,51.07,7.68,110.56,40,110.93,29.24.34,43.15-77.07,48.38-121.71,2.68-22.9,5.83-22.53,8.51-45.42.34-2.9-1.65-9.45.96-8.98,2.6.47,5.83,3.79,6.8,6.5,9.51,26.59,8.63,26.86,17.8,53.57,6.33,18.42,6.15,18.41,12.14,36.95,6.4,19.81,14.84,37.37,11.09,58.11-2.55,14.11,4.64,27.79,19.75,25.39,7.04-7.73.26-10.56,6.22-19.16,10.68-3.08,22.76-4.48,30.92-9.76,3.38-30.21,12.52-59.12,13.56-89.02,3.3-95.11-.13-95.26,3.17-190.37.65-18.57-4.4-29.23-19.14-39.5Z"/>
     </svg>
-  </header>
+    </header>
 
-  <div class="spacer" aria-hidden="true"></div>
+    <main class="content">
+      <p class="lede">Sleepwalk Press is an independent publisher of books by artists, working across photography, collage, drawing, essay, and fiction.</p>
+      <p class="about">We work closely with artists and writers at any stage of their careers to realise new works of cultural expression. SLEEPWALK is based in Prague and distributes internationally. <a href="mailto:info@sleepwalk.site">Get&nbsp;in&nbsp;touch.</a></p>
+    </main>
 
-  <main class="content">
-    <p class="lede">Sleepwalk Press is an independent publisher of art books and experimental texts by artists and writers, working across photography, collage, drawing, essay, fiction, and criticism.</p>
-    <p class="about">Founded as an infrastructure to materialize author vision, we work closely with artists and writers at any stage of their careers to realise new works of cultural expression. SLEEPWALK is based in Prague and distributes internationally. <a href="mailto:info@sleepwalk.site">Get&nbsp;in&nbsp;touch.</a></p>
-  </main>
+    <div class="spacer" aria-hidden="true"></div>
+  </section>
+
+  <section class="upcoming">
+    <h2 class="upcoming-heading">Upcoming Titles</h2>
+    <ul class="upcoming-list">
+      <li>Rachael Thorleifson<br><cite>The Whole World Held Together by Spider Webs</cite><br>August 2026.</li>
+      <li>John Patterson<br><cite>Temptation</cite><br>September 2026.</li>
+      <li><cite>&ldquo;Curate This&rdquo; Cap</cite><br>September 2026.</li>
+    </ul>
+  </section>
 </body>
 </html>
