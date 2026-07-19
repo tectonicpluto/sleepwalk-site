@@ -125,6 +125,67 @@
     .links__jump {
       margin-left: auto;
       white-space: nowrap;
+      /* Underline lives on the label, not the anchor, so the animating
+         arrow doesn't leave a stranded underline dash behind it. */
+      text-decoration: none;
+    }
+
+    .links__jump-label {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    .links__jump:hover .links__jump-label,
+    .links__jump:focus-visible .links__jump-label {
+      text-decoration-thickness: 2px;
+    }
+
+    .links__jump-arrow {
+      display: inline-block;
+      /* Gap is a margin rather than an &nbsp; so it can switch sides with the
+         arrow on mobile; an &nbsp; would be an untargetable anonymous item. */
+      margin-right: 0.5em;
+      /* Movement and fade run as separate animations so the fade can be
+         retimed without perturbing the drop's easing curve. */
+      animation: arrow-drop 4s infinite, arrow-fade 4s infinite;
+    }
+
+    /* Rest 3s, fall away downward, then drop back in from above.
+       The jump from below to above happens while opacity is 0. */
+    @keyframes arrow-drop {
+      0%, 75% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19); /* ease-in: accelerates away */
+      }
+
+      87% {
+        transform: translateY(1.4em);
+      }
+
+      87.5% {
+        transform: translateY(-1.4em);
+        animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out: settles into place */
+      }
+
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    /* Holds full opacity for the first two-thirds of the fall, then cuts
+       out quickly once the arrow is already well clear of the text. */
+    @keyframes arrow-fade {
+      0%, 80% {
+        opacity: 1;
+      }
+
+      87%, 87.5% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
     }
 
     a {
@@ -218,7 +279,8 @@
         scroll-behavior: auto;
       }
 
-      .upcoming-list li::before {
+      .upcoming-list li::before,
+      .links__jump-arrow {
         animation: none;
       }
     }
@@ -242,9 +304,19 @@
         font-size: 1rem;
       }
 
-      /* Stacked: keep the jump link left-aligned with the rest */
+      /* Stacked: keep the jump link left-aligned with the rest, and move the
+         arrow after the label so it doesn't sit in the left-aligned column
+         with the other links. */
       .links__jump {
         margin-left: 0;
+        display: inline-flex;
+        align-items: baseline;
+      }
+
+      .links__jump-arrow {
+        order: 1;
+        margin-right: 0;
+        margin-left: 0.5em;
       }
 
       .upcoming-list {
@@ -290,7 +362,7 @@
         <!-- Targets the footer, not #upcoming: the footer is shorter than the
              viewport, so the browser clamps this scroll to the very bottom of
              the page and the footer can never land half-cut-off. -->
-        <a class="links__jump" href="#site-footer">&darr;&nbsp;Upcoming Releases</a>
+        <a class="links__jump" href="#site-footer"><span class="links__jump-arrow" aria-hidden="true">&darr;</span><span class="links__jump-label">Upcoming Releases</span></a>
       </nav>
     </main>
 
@@ -302,7 +374,7 @@
     <ul class="upcoming-list">
       <li><cite>The Whole World Held Together by Spider Webs</cite><br>Rachael&nbsp;Thorleifson, August&nbsp;2026</li>
       <li><cite>Temptation: Sacred Architecture & Modern Thought</cite><br>John&nbsp;Patterson, September&nbsp;2026</li>
-      <li>&ldquo;Information Overload!&rdquo; Tote<br>September&nbsp;2026</li>
+      <li>&ldquo;Information Overload!&rdquo; Everything Tote<br>September&nbsp;2026</li>
     </ul>
   </section>
 
