@@ -25,6 +25,23 @@
       --page-pad-x: clamp(1rem, 1.6vw, 1.5rem);
       --page-pad-y: clamp(1rem, 1.6vw, 1.5rem);
       --gap-row: clamp(1.25rem, 2.5vw, 2rem);
+      /* Floating-label size. Its own step below the body scale — the label is a
+         field affordance, not body copy, so it shouldn't ride the links-row
+         font-size the way the fine print does. */
+      --font-size-label: 0.6875rem;
+      /* Space the floated label occupies above the input, inside the field. */
+      --label-gutter: calc(var(--font-size-label) * 1.4);
+      /* Shared by the input and the SUBSCRIBE button so the two boxes match. */
+      --field-pad-x: 0.75rem;
+      --field-pad-y: 0.5rem;
+      --field-bg: #c4bfbc;
+      /* Open width of the newsletter form. Explicit, because the alternative —
+         letting it size to its contents — hands the decision to the consent
+         sentence, the widest thing in the form by far. Sized to fit that
+         sentence on one line. In em, so it tracks the links row's own font-size
+         clamp: both use sites inherit that size, and the sentence it's cut to
+         fit scales with it. */
+      --newsletter-w: 45em;
       --footer-logo-h: clamp(1.5rem, 2.5vw, 2.25rem);
       --footer-h: calc(var(--page-pad-y) * 2 + var(--footer-logo-h));
     }
@@ -117,9 +134,323 @@
       line-height: 1.45;
     }
 
-    /* Placeholder until the newsletter signup URL is ready */
-    .links__pending {
+    /* Trigger and panel share one flex item. If the panel were a sibling item it
+       would contribute a links-row gap (up to 3rem) even while collapsed, leaving
+       a phantom space next to "Newsletter". */
+    /* flex-start, not baseline: .newsletter__inner is overflow:hidden, and an
+       overflow-clipped box synthesises its baseline from the bottom margin edge
+       instead of exporting the form's first line. Baseline alignment would
+       therefore drop the open form below "Newsletter". Aligning tops gets the
+       baselines matching anyway, since both sides share the row's line-height. */
+    .newsletter-wrap {
+      display: flex;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    /* Newsletter disclosure. The trigger is a real <button> (it toggles content,
+       it doesn't navigate) painted to match the anchors beside it. */
+    .links__toggle {
+      font: inherit;
+      text-transform: inherit;
+      color: inherit;
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+      /* The form's gap lives here, on the trigger, rather than as padding on
+         .newsletter__form. Inside the panel it was part of what the wipe
+         revealed, so it read as a second, separate movement after the form had
+         already arrived. Out here it's static and the reveal is one gesture.
+         Padding isn't underlined, so the trigger's rule stays tight to the word. */
+      padding-right: 0.75rem;
+    }
+
+    .links__toggle:hover,
+    .links__toggle:focus-visible {
+      text-decoration-thickness: 2px;
+    }
+
+    /* Collapsed by way of 0fr grid tracks rather than display:none, so the
+       reveal can animate. The inner wrapper needs min-width:0 or the form's
+       intrinsic width would hold the track open.
+
+       Desktop animates the panel's own width over a form that has already been
+       laid out at its final size, so the reveal only ever moves the clip edge —
+       the contents never reposition.
+
+       It used to be a 0fr→1fr grid track. With a flexible track the grid
+       container's width is itself resolved from that track's contents, so the
+       panel's box and the wipe were coupled and the last step of the
+       interpolation re-resolved the container, sliding the whole form sideways
+       after it had finished appearing. Width is a plain length: nothing
+       downstream depends on it.
+
+       Height is unaffected by any of this — the form's width is fixed, so its
+       height is constant even while the panel is 0 wide, and the links row
+       reserves that height permanently. Open/close causes no vertical reflow.
+       The cost is empty space under the row while closed, which the hero's
+       flexible spacer absorbs. */
+    .newsletter {
+      width: 0;
+      overflow: hidden;
+      /* Baseline match. The label gutter and the input's top padding are the two
+         things sitting between the panel's top edge and the input's text, so
+         lifting the panel by their sum puts that text on the links' baseline.
+         Applied here rather than to the form because the clip box travels with
+         the panel — offsetting the form inside it would crop the label. */
+      margin-top: calc((var(--label-gutter) + var(--field-pad-y)) * -1);
+      transition: width 350ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .newsletter.is-open {
+      width: var(--newsletter-w);
+    }
+
+    /* The form now sizes itself (width:max-content), so the wrap just needs to
+       stop being squeezed — no fixed basis to fight it. .links__jump keeps its
+       margin-left:auto right pin either way. */
+    .newsletter-wrap:has(.newsletter.is-open) {
+      flex: 0 1 auto;
+    }
+
+    .newsletter__inner {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    /* The fixed width is what stops the form's contents popping. Left fluid, it
+       would be laid out afresh at every width the panel passes through, so its
+       items rewrap on each frame and snap at the end. Pinned, the panel's wipe
+       uncovers a layout that was settled before the animation began — this and
+       .newsletter's width transition are the two halves of the same idea.
+
+       The value can't be max-content: that let the unwrapped consent sentence
+       dictate the width — roughly 55rem — which overran the row and bumped
+       UPCOMING RELEASES onto a second line. Pinned, the sentence wraps to two
+       lines inside the form rather than stretching it, at no cost in open/close
+       reflow, since the height is reserved permanently either way. */
+    .newsletter__form {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.5rem 0.75rem;
+      width: var(--newsletter-w);
+    }
+
+    /* The gutter holds the floated label. It has to be inside the field rather
+       than above the form, because .newsletter__inner clips — a label floating
+       past the panel's top edge would be cut off. Baseline alignment is handled
+       by offsetting the whole panel instead; see .newsletter's margin-top.
+
+       Grows into whatever --newsletter-w leaves beside the button, rather than
+       carrying a width of its own. (It was a fixed 22rem, and before that 50ch
+       — ch measures Serial C's zero, which is wide enough that 50ch ran nearly
+       the full bar.) */
+    .newsletter__field {
+      position: relative;
+      flex: 1 1 12rem;
+      padding-top: var(--label-gutter);
+    }
+
+    /* Opts out of the site-wide uppercase: this field shows the address as the
+       user types it, and rendering it YOU@EXAMPLE.COM reads as a broken field.
+       Visual only — text-transform never changes the submitted value. */
+    .newsletter__email {
+      font: inherit;
+      text-transform: none;
+      color: var(--color-fg);
+      background: var(--field-bg);
+      border: 0;
+      border-radius: 0; /* iOS Safari rounds inputs by default */
+      padding: var(--field-pad-y) var(--field-pad-x);
+      width: 100%;
+    }
+
+    /* Replaces the browser's focus ring with an inset hairline, which reads as
+       the field's own border rather than something drawn on top of it.
+       outline-offset pulls it inside the box so nothing shifts. */
+    .newsletter__email:focus {
+      outline: 1px solid var(--color-fg);
+      outline-offset: -1px;
+    }
+
+    /* The real placeholder is a single space, present only so :placeholder-shown
+       can detect an empty field. The visible "Email address" is this <label>,
+       which sits in the field at rest and rises above it once the field is
+       focused or filled — a placeholder that vanishes as you type takes the
+       field's name with it. */
+    .newsletter__label {
+      position: absolute;
+      left: var(--field-pad-x);
+      top: calc(var(--label-gutter) + var(--field-pad-y));
       opacity: 0.55;
+      pointer-events: none;
+      transition:
+        top 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        font-size 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 160ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .newsletter__email:focus + .newsletter__label,
+    .newsletter__email:not(:placeholder-shown) + .newsletter__label {
+      top: 0;
+      left: 0;
+      font-size: var(--font-size-label);
+      opacity: 1;
+    }
+
+    /* Parks the label in its floated position while the panel is shut, so the
+       reveal doesn't catch it mid-slide. The trigger focuses the input in the
+       same click that opens the panel, and the label would otherwise spend the
+       first 160ms of the reveal travelling upward. Starting it there means the
+       focus rule above changes nothing and there is simply no animation to see.
+
+       transition:none matters on close too — the label snaps back to parked
+       behind the collapsing panel rather than sliding while it shrinks.
+
+       The second selector covers closing. Pressing the trigger focuses it on
+       mousedown, which blurs the input — and click, where .is-open comes off,
+       only fires afterwards. In between, the panel is still open with nothing
+       focused inside it, so the label would start dropping into the box and get
+       snapped back up as the class landed. Holding it parked while the trigger
+       itself has focus closes that window.
+
+       Note this only pre-empts the reveal and the close. Blur the field by
+       clicking anywhere else with it still empty and the label drops into the
+       box with its normal 160ms float, as neither selector applies then. */
+    .newsletter:not(.is-open) .newsletter__label,
+    .newsletter-wrap:has(.links__toggle:focus) .newsletter__label {
+      top: 0;
+      left: 0;
+      font-size: var(--font-size-label);
+      opacity: 1;
+      transition: none;
+    }
+
+    /* Same padding as the input, and the form's baseline alignment then squares
+       the two boxes up automatically — the field's label gutter pushes the input
+       down, and the button follows its baseline. */
+    .newsletter__submit {
+      font: inherit;
+      text-transform: inherit;
+      color: var(--color-bg);
+      background: var(--color-fg);
+      border: 0;
+      border-radius: 0;
+      padding: var(--field-pad-y) var(--field-pad-x);
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .newsletter__submit:hover:not(:disabled) {
+      opacity: 0.85;
+    }
+
+    .newsletter__submit:focus-visible {
+      outline: 1px solid var(--color-fg);
+      outline-offset: 2px;
+    }
+
+    .newsletter__submit:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    /* 100% basis drops it onto its own line under the field. Uncapped now, so
+       the sentence stays on that one line instead of wrapping. */
+    .newsletter__consent {
+      flex: 1 1 100%;
+      display: flex;
+      align-items: baseline;
+      gap: 0.5em;
+      font-size: 0.8em;
+      line-height: 1.35;
+      text-transform: none;
+    }
+
+    /* appearance:none replaces the native control outright — accent-color could
+       only have tinted it, not square off its corners. margin:0 clears the UA's
+       default (3px 3px 3px 4px in most browsers), which is what was holding the
+       box out of alignment with the input's left edge above it.
+
+       Baseline alignment is deliberate: with no text of its own the box's
+       baseline is synthesised from its bottom edge, so it sits on the consent
+       line's baseline the way a letter would, and stays on the first line if the
+       sentence ever wraps. */
+    .newsletter__consent input {
+      appearance: none;
+      -webkit-appearance: none;
+      flex-shrink: 0;
+      margin: 0;
+      /* Optical nudge, deliberately a transform rather than a margin. The box
+         reports a real baseline (inherited from the ::before tick, which is a
+         grid item), so it aligns by that baseline and a bottom margin can't lift
+         it — margin would only extend the item downward, growing the flex line,
+         the form, the reserved height, and with it the hero. A transform moves
+         the box without taking part in layout at all. More negative lifts
+         further; positive drops it. */
+      transform: translateY(-0.22em);
+      width: 1em;
+      height: 1em;
+      background: var(--field-bg);
+      border: 1px solid var(--color-fg);
+      border-radius: 0;
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+    }
+
+    .newsletter__consent input:checked {
+      background: var(--color-fg);
+    }
+
+    /* The tick is two borders on a rotated box rather than a glyph or an SVG —
+       it inherits the silver cleanly and needs no font or asset. */
+    .newsletter__consent input::before {
+      content: "";
+      width: 0.5em;
+      height: 0.25em;
+      border-left: 1.5px solid var(--field-bg);
+      border-bottom: 1.5px solid var(--field-bg);
+      transform: translateY(-15%) rotate(-45deg);
+      opacity: 0;
+    }
+
+    .newsletter__consent input:checked::before {
+      opacity: 1;
+    }
+
+    /* Needed explicitly now: appearance:none also drops the native focus ring. */
+    .newsletter__consent input:focus-visible {
+      outline: 1px solid var(--color-fg);
+      outline-offset: 2px;
+    }
+
+    .newsletter__status {
+      flex: 1 1 100%;
+      margin: 0;
+      font-size: 0.8em;
+      line-height: 1.35;
+      text-transform: none;
+    }
+
+    .newsletter__status:empty {
+      display: none;
+    }
+
+    /* Honeypot: off-screen and out of the tab order, but not display:none —
+       some bots skip genuinely hidden fields, and this one is bait. */
+    .newsletter__hp {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
 
     .links__jump {
@@ -283,6 +614,11 @@
       .links__jump-arrow {
         animation: none;
       }
+
+      .newsletter,
+      .newsletter__label {
+        transition: none;
+      }
     }
 
     a:hover,
@@ -317,6 +653,76 @@
         order: 1;
         margin-right: 0;
         margin-left: 0.5em;
+      }
+
+      /* Stacked: the form opens downward instead of sideways, pushing the rest
+         of the page down. Same 0fr technique, rotated to the row axis. */
+      .newsletter-wrap {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+      }
+
+      .newsletter-wrap:has(.newsletter.is-open) {
+        flex: initial;
+      }
+
+      /* Stacked, the panel expands downward, so this axis keeps the 0fr→1fr
+         grid track — the sideways-slide problem that drove desktop to animating
+         width doesn't arise on the block axis, where the track's size follows
+         the content rather than the other way round. The clipping is done by
+         .newsletter__inner here, so the panel itself stays visible. There's no
+         links baseline to meet either, so the desktop lift comes off. */
+      .newsletter {
+        display: grid;
+        width: 100%;
+        overflow: visible;
+        grid-template-columns: 1fr;
+        grid-template-rows: 0fr;
+        margin-top: 0;
+        transition: grid-template-rows 350ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      /* Width too: the desktop .is-open rule outweighs the plain .newsletter
+         selector above on specificity, so it has to be restated. */
+      .newsletter.is-open {
+        width: 100%;
+        grid-template-rows: 1fr;
+      }
+
+      /* Back to fluid: stacked, the panel is full-width and the track isn't
+         animating on the inline axis, so there's no reflow-pop to guard against
+         and max-content would just overflow the viewport. */
+      .newsletter__form {
+        width: auto;
+        padding-top: 0.75rem;
+      }
+
+      /* Stacked, the panel is below the trigger, so the trigger's trailing gap
+         would just widen its hit area to no purpose. */
+      .links__toggle {
+        padding-right: 0;
+      }
+
+      .newsletter__field {
+        flex: 1 1 100%;
+        order: 1;
+      }
+
+      /* Stacked, the consent reads better as a condition on the button than as
+         a footnote after it, so it moves above SUBSCRIBE. Done with order rather
+         than by moving the markup, because the DOM sequence is what desktop's
+         single row depends on. */
+      .newsletter__consent {
+        order: 2;
+      }
+
+      .newsletter__submit {
+        order: 3;
+      }
+
+      .newsletter__status {
+        order: 4;
       }
 
       .upcoming-list {
@@ -357,8 +763,48 @@
       <nav class="links" aria-label="Elsewhere">
         <a href="mailto:info@sleepwalk.site">Contact</a>
         <a href="https://www.instagram.com/sleepwalkbooks/" target="_blank" rel="noopener">Instagram</a>
-        <!-- TODO: swap this span for <a href="..."> once the signup URL exists -->
-        <span class="links__pending">Newsletter</span>
+        <div class="newsletter-wrap">
+          <button type="button" class="links__toggle" id="newsletter-toggle"
+                  aria-expanded="false" aria-controls="newsletter-panel">Newsletter</button>
+
+          <!-- Posts to the Payload app, which records consent and syncs to our
+               self-hosted Listmonk. The list is DOUBLE OPT-IN, so nothing is sent
+               until the subscriber clicks the link in the confirmation email —
+               hence the wording of the success message below. -->
+          <div class="newsletter" id="newsletter-panel" inert>
+            <div class="newsletter__inner">
+              <form class="newsletter__form" id="newsletter-form" novalidate>
+                <!-- placeholder=" " is load-bearing: the visible "Email address"
+                     is the <label> below, and :placeholder-shown is what tells
+                     it whether to sit in the field or float above it. The label
+                     supersedes the old aria-label. -->
+                <div class="newsletter__field">
+                  <input class="newsletter__email" id="newsletter-email" name="email"
+                         type="email" required autocomplete="email"
+                         placeholder=" " />
+                  <label class="newsletter__label" for="newsletter-email">Email address</label>
+                </div>
+
+                <button class="newsletter__submit" type="submit">Subscribe</button>
+
+                <div class="newsletter__hp" aria-hidden="true">
+                  <label for="newsletter-website">Leave this field empty</label>
+                  <input id="newsletter-website" name="website" type="text"
+                         tabindex="-1" autocomplete="off" />
+                </div>
+
+                <label class="newsletter__consent">
+                  <input type="checkbox" name="consent" required />
+                  <span>I agree to receive emails from Sleepwalk and accept the
+                    <a href="/privacy.html">privacy policy</a>.</span>
+                </label>
+
+                <p class="newsletter__status" id="newsletter-status" role="status" aria-live="polite"></p>
+              </form>
+            </div>
+          </div>
+        </div>
+
         <!-- Targets the footer, not #upcoming: the footer is shorter than the
              viewport, so the browser clamps this scroll to the very bottom of
              the page and the footer can never land half-cut-off. -->
@@ -396,6 +842,76 @@
       window.addEventListener('scroll', update, { passive: true });
       window.addEventListener('resize', update);
       update();
+    })();
+
+    // Newsletter disclosure + signup.
+    (() => {
+      const ENDPOINT = 'https://cms.sleepwalk.site/api/newsletter';
+
+      const toggle = document.getElementById('newsletter-toggle');
+      const panel = document.getElementById('newsletter-panel');
+      const form = document.getElementById('newsletter-form');
+      const status = document.getElementById('newsletter-status');
+      const email = document.getElementById('newsletter-email');
+      const submit = form.querySelector('.newsletter__submit');
+
+      const say = (message) => { status.textContent = message; };
+
+      toggle.addEventListener('click', () => {
+        const open = panel.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', String(open));
+        // `inert` keeps the collapsed form's fields out of the tab order — the
+        // panel is only visually clipped, not display:none.
+        if (open) {
+          panel.removeAttribute('inert');
+          // preventScroll matters here. The panel is overflow:hidden, which is
+          // still a scroll container, and at this moment it is 0px wide because
+          // the reveal hasn't started. A plain focus() makes the browser scroll
+          // the input into view by setting scrollLeft on the panel, which shifts
+          // the form left; when the width animation finishes and the input fits
+          // again, scrollLeft snaps back to 0 and the form jumps right. That
+          // snap is the second movement at the end of the animation.
+          email.focus({ preventScroll: true });
+        } else {
+          panel.setAttribute('inert', '');
+        }
+      });
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const address = email.value.trim();
+        const consent = form.elements.consent.checked;
+
+        if (!address) return say('Please enter your email address.');
+        if (!consent) return say('Please accept the privacy policy to subscribe.');
+
+        submit.disabled = true;
+        say('Subscribing…');
+
+        fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: address,
+            consent,
+            source: 'placeholder site',
+            website: form.elements.website.value,
+          }),
+        })
+          .then((res) => {
+            if (res.ok) {
+              form.reset();
+              // Double opt-in — say so plainly, or people assume they're done.
+              return say('Almost there — check your inbox and click the link to confirm.');
+            }
+            if (res.status === 429) return say('Too many attempts. Please try again in a few minutes.');
+            if (res.status === 400) return say('That email address doesn’t look right.');
+            say('Something went wrong. Please try again later.');
+          })
+          .catch(() => say('Could not reach the server. Please check your connection.'))
+          .finally(() => { submit.disabled = false; });
+      });
     })();
   </script>
 </body>
