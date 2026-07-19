@@ -9,11 +9,19 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="https://use.typekit.net/omh5mvu.css" />
+  <link rel="preload" as="font" type="font/woff2" href="/WOFF2/SerialC-Medium.woff2" crossorigin>
   <style>
+    @font-face {
+      font-family: "Serial C";
+      src: url("/WOFF2/SerialC-Medium.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
-      --color-fg: #f7e0bb; /*old color: #e5e5e5 */
-      --color-bg: #e54630; /*old color: #2c3322 */
+      --color-fg: #21201c; /*old color: #e5e5e5 */
+      --color-bg: #9b9437; /*old color: #2c3322 */
       --page-pad-x: clamp(1rem, 1.6vw, 1.5rem);
       --page-pad-y: clamp(1rem, 1.6vw, 1.5rem);
       --gap-row: clamp(1.25rem, 2.5vw, 2rem);
@@ -33,12 +41,17 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       background-color: var(--color-bg);
       color: var(--color-fg);
-      font-family: "neue-haas-grotesk-text", sans-serif;
-      font-weight: 400;
+      font-family: "Serial C", sans-serif;
+      font-weight: 500;
       font-style: normal;
+      text-transform: uppercase;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       line-height: 1.2;
@@ -94,11 +107,24 @@
       letter-spacing: -0.005em;
     }
 
-    .about {
-      grid-column: 1 / span 5;
-      margin: 0;
+    .links {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: clamp(1.5rem, 3vw, 3rem);
       font-size: clamp(1rem, 1.1vw, 1.125rem);
       line-height: 1.45;
+    }
+
+    /* Placeholder until the newsletter signup URL is ready */
+    .links__pending {
+      opacity: 0.55;
+    }
+
+    .links__jump {
+      margin-left: auto;
+      white-space: nowrap;
     }
 
     a {
@@ -108,8 +134,8 @@
     }
 
     .upcoming {
-      background-color: #333;
-      color: #fff000;
+      background-color: var(--color-fg);
+      color: var(--color-bg);
       padding: calc(var(--page-pad-y)*8) var(--page-pad-x);
       min-height: max(calc(100vh - var(--footer-h)), 640px);
       min-height: max(calc(100svh - var(--footer-h)), 640px);
@@ -126,7 +152,7 @@
       font-size: clamp(1.5rem, 3.4vw, 3rem);
       line-height: 1.18;
       letter-spacing: -0.005em;
-      font-weight: 400;
+      font-weight: 500;
     }
 
     .upcoming-list {
@@ -158,8 +184,8 @@
     }
 
     .site-footer {
-      background-color: #333;
-      color: #fff000;
+      background-color: var(--color-fg);
+      color: var(--color-bg);
       padding: var(--page-pad-y) var(--page-pad-x);
       display: flex;
       align-items: center;
@@ -188,6 +214,10 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
       .upcoming-list li::before {
         animation: none;
       }
@@ -200,17 +230,21 @@
 
     /* Mobile / narrow viewports */
     @media (max-width: 768px) {
-      .lede,
-      .about {
-        grid-column: 1 / -1;
-      }
-
       .lede {
+        grid-column: 1 / -1;
         font-size: clamp(1.5rem, 6.5vw, 2.25rem);
       }
 
-      .about {
+      .links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
         font-size: 1rem;
+      }
+
+      /* Stacked: keep the jump link left-aligned with the rest */
+      .links__jump {
+        margin-left: 0;
       }
 
       .upcoming-list {
@@ -246,23 +280,33 @@
     </header>
 
     <main class="content">
-      <p class="lede">Sleepwalk Press is an independent publisher of books by artists, working across photography, collage, drawing, essay, and fiction.</p>
-      <p class="about">We work closely with artists and writers at any stage of their careers to realise new works of cultural expression. SLEEPWALK is based in Prague and distributes internationally. <a href="mailto:info@sleepwalk.site">Get&nbsp;in&nbsp;touch.</a></p>
+      <p class="lede">Sleepwalk is a small&ndash;run publisher of artist books and experimental texts.</p>
+
+      <nav class="links" aria-label="Elsewhere">
+        <a href="mailto:info@sleepwalk.site">Contact</a>
+        <a href="https://www.instagram.com/sleepwalkbooks/" target="_blank" rel="noopener">Instagram</a>
+        <!-- TODO: swap this span for <a href="..."> once the signup URL exists -->
+        <span class="links__pending">Newsletter</span>
+        <!-- Targets the footer, not #upcoming: the footer is shorter than the
+             viewport, so the browser clamps this scroll to the very bottom of
+             the page and the footer can never land half-cut-off. -->
+        <a class="links__jump" href="#site-footer">&darr;&nbsp;Upcoming Releases</a>
+      </nav>
     </main>
 
     <div class="spacer" aria-hidden="true"></div>
   </section>
 
-  <section class="upcoming">
-    <h2 class="upcoming-heading">Upcoming Titles</h2>
+  <section class="upcoming" id="upcoming">
+    <h2 class="upcoming-heading">Upcoming Releases</h2>
     <ul class="upcoming-list">
       <li><cite>The Whole World Held Together by Spider Webs</cite><br>Rachael&nbsp;Thorleifson, August&nbsp;2026</li>
       <li><cite>Temptation: Sacred Architecture & Modern Thought</cite><br>John&nbsp;Patterson, September&nbsp;2026</li>
-      <li>&ldquo;Curate This&rdquo; Cap<br>September&nbsp;2026</li>
+      <li>&ldquo;Information Overload!&rdquo; Tote<br>September&nbsp;2026</li>
     </ul>
   </section>
 
-  <footer class="site-footer">
+  <footer class="site-footer" id="site-footer">
     <svg class="site-footer__logo" viewBox="0 0 1717.01 587.12" role="img" aria-label="SLEEPWALK">
       <use href="#sleepwalk-logo"/>
     </svg>
