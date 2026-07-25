@@ -1,0 +1,23 @@
+# Sleepwalk Press
+
+> Sleepwalk (Sleepwalk Press) is an independent, small-run publisher of artist books and experimental texts by artists and writers, working across photography, collage, drawing, essay, fiction, and criticism. Based in Prague, Czech Republic.
+
+The website is currently a single-page placeholder while the full catalogue and online store are in development. It announces upcoming releases and offers a newsletter sign-up.
+
+- Contact: info@sleepwalk.site
+- Instagram: https://www.instagram.com/sleepwalkbooks/
+- Location: Prague, Czech Republic
+
+Upcoming releases:
+
+- *The Whole World Held Together by Spider Webs* — Rachael Thorleifson, August 2026
+- *Temptation: Sacred Architecture & Modern Thought* — John Patterson, September 2026
+- "Information Overload!" Everything Tote — September 2026
+
+## Pages
+
+- [Home](https://sleepwalk.site/): Publisher statement, upcoming releases, and newsletter sign-up.
+
+## Optional
+
+- [Privacy Policy](https://sleepwalk.site/privacy): How Sleepwalk collects, uses, and protects personal data.

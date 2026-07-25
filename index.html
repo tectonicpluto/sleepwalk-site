@@ -796,7 +796,7 @@
                 <label class="newsletter__consent">
                   <input type="checkbox" name="consent" required />
                   <span>I agree to receive emails from Sleepwalk and accept the
-                    <a href="/privacy.html">privacy policy</a>.</span>
+                    <a href="/privacy">privacy policy</a>.</span>
                 </label>
 
                 <p class="newsletter__status" id="newsletter-status" role="status" aria-live="polite"></p>
@@ -850,12 +850,32 @@
 
       const toggle = document.getElementById('newsletter-toggle');
       const panel = document.getElementById('newsletter-panel');
+      const wrap = toggle.closest('.newsletter-wrap');
       const form = document.getElementById('newsletter-form');
       const status = document.getElementById('newsletter-status');
       const email = document.getElementById('newsletter-email');
       const submit = form.querySelector('.newsletter__submit');
 
       const say = (message) => { status.textContent = message; };
+
+      // On mobile (the stacked layout at max-width:768px) the panel opens
+      // downward and the on-screen keyboard then covers the lower page, so the
+      // field the user is typing into can sit off-screen. The desktop
+      // preventScroll above deliberately leaves the viewport put — there the
+      // form opens sideways and is already in view — so only mobile scrolls.
+      // We move the wrap, not the input: its top is fixed while the panel
+      // animates, and scrolling the wrap vertically can't set the panel's
+      // scrollLeft, which is the horizontal snap preventScroll guards against.
+      // behavior is omitted so the scroll follows the CSS scroll-behavior,
+      // which prefers-reduced-motion already turns off.
+      email.addEventListener('focus', () => {
+        if (!window.matchMedia('(max-width: 768px)').matches) return;
+        // Wait for the open animation to lay out the field and the keyboard to
+        // begin rising before aligning the wrap to the top of the viewport.
+        setTimeout(() => {
+          wrap.scrollIntoView({ block: 'start' });
+        }, 350);
+      });
 
       toggle.addEventListener('click', () => {
         const open = panel.classList.toggle('is-open');
